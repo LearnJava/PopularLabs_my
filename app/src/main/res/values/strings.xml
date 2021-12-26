@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">GitHubView</string>
+    <string name="tv_login_tools_text">Имя пользователя</string>
+    <string name="user_login_tools_text">Логин</string>
+
+    <!-- Ошибки -->
+    <string name="error_get_list_users">Ошибка при получении списка пользователей: </string>
+    <string name="error_not_user_name">Ошибка: Нет запрошенного пользователя в списке.</string>
+</resources>
