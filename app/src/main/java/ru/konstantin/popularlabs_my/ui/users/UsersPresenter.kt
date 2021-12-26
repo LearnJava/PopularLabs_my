@@ -1,10 +1,10 @@
 package ru.konstantin.popularlabs_my.ui.users
 
-import android.widget.Toast
+import android.util.Log
 import com.github.terrakok.cicerone.Router
-import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
+import io.reactivex.rxjava3.schedulers.Schedulers
 import moxy.MvpPresenter
-import ru.konstantin.popularlabs_my.R
 import ru.konstantin.popularlabs_my.domain.GithubUsersRepository
 import ru.konstantin.popularlabs_my.model.GithubUserModel
 import ru.konstantin.popularlabs_my.screens.AppScreens
@@ -15,9 +15,12 @@ class UsersPresenter(
     private val usersRepository: GithubUsersRepository,
     private val usersFragment: UsersFragment?
 ): MvpPresenter<UsersView>() {
-
-    val usersListPresenter = UsersListPresenter()
+    /** ИСХОДНЫЕ ДАННЫЕ */ //region
+    // users
     private var users: List<GithubUserModel> = listOf()
+    // usersListPresenter
+    val usersListPresenter = UsersListPresenter()
+    //endregion
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -26,33 +29,37 @@ class UsersPresenter(
 
         usersFragment?.let { usersFragment ->
             usersListPresenter.itemClickListener = { userItemView ->
-                router.navigateTo(
-                    AppScreens.loginScreen(
-                        (if (userItemView.pos < users.size) users[userItemView.pos].login
-                        else usersFragment.resources.getString(R.string.error_not_user_name))
-                    )
-                )
+                val userModel: GithubUserModel = GithubUserModel(users[userItemView.pos].login,
+                    users[userItemView.pos].avatarUrl, users[userItemView.pos].reposUrl)
+                usersFragment.getMainActivity()?.let { mainActivity ->
+                    mainActivity.setGithubUserModel(userModel)
+                    mainActivity.setUsersModel(users)
+                }
+                router.navigateTo(AppScreens.repoScreen())
             }
         }
     }
 
-    private fun loadData() {
-        usersFragment?.let { usersFragment ->
-            usersRepository.getUsers()
-                .switchMap {
-                    return@switchMap Observable.just( it )}
-                .subscribe(
-                    {
-                        users = it
-                        usersFragment.getAdapter().submitList(it)
-                    },
-                    {
-                        Toast.makeText(usersFragment.requireContext(), "${
-                            usersFragment.resources.getString(R.string.error_get_list_users)}$it",
-                            Toast.LENGTH_LONG).show()
+    fun loadData() {
+        usersRepository.getUsers()
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .doOnSubscribe { viewState.showLoading() }
+            .subscribe(
+                { users ->
+                    this.users = users
+                    usersFragment?.let { usersFragment ->
+                        usersFragment.getMainActivity()?.let { mainActivity ->
+                            mainActivity.setUsersModel(users)
+                        }
                     }
-                )
-        }
+                    viewState.updateList(users)
+                    viewState.hideLoading()
+                }, { e ->
+                    Log.e("mylogs", "Ошибка при получении пользователей", e)
+                    viewState.hideLoading()
+                }
+            )
     }
 
     fun backPressed(): Boolean {
@@ -60,9 +67,9 @@ class UsersPresenter(
         return true
     }
 
-    class UsersListPresenter: IListPresenter<UserItemView> {
+    class UsersListPresenter(): IListPresenter<UserItemView> {
 
-        val users = mutableListOf<GithubUserModel>()
+        var users: MutableList<GithubUserModel> = mutableListOf<GithubUserModel>()
 
         override var itemClickListener: (UserItemView) -> Unit = {}
 
@@ -71,6 +78,11 @@ class UsersPresenter(
         override fun bindView(view: UserItemView) {
             val user = users[view.pos]
             view.setLogin(user.login)
+            view.setAvatar(user.avatarUrl)
         }
+    }
+
+    fun setUsers(users: List<GithubUserModel>) {
+        this.users = users
     }
 }

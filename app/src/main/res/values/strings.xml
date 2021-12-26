@@ -1,9 +1,18 @@
 <resources>
     <string name="app_name">GitHubView</string>
+
     <string name="tv_login_tools_text">Имя пользователя</string>
     <string name="user_login_tools_text">Логин</string>
+    <string name="tv_repo_name_tools_text">Имя репозитория</string>
+    <string name="repos_title_tools_text">Перечень репозиториев пользователя</string>
+    <string name="users_title_text">Список пользователей\nс Github.com:</string>
 
     <!-- Ошибки -->
     <string name="error_get_list_users">Ошибка при получении списка пользователей: </string>
-    <string name="error_not_user_name">Ошибка: Нет запрошенного пользователя в списке.</string>
+    <string name="error_not_user_name">Ошибка: Нет запрошенного пользователя в списке</string>
+    <string name="repo_title_tools_text">Информация о репозитории пользователя</string>
+    <string name="repo_id_tools_text">ID репозитория:</string>
+    <string name="repo_name_text">Имя репозитория</string>
+    <string name="repo_owner_id_text">ID владельца репозитория:</string>
+    <string name="forks_number_tools_text">Количество форков</string>
 </resources>
