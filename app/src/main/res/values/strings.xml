@@ -6,13 +6,23 @@
     <string name="tv_repo_name_tools_text">Имя репозитория</string>
     <string name="repos_title_tools_text">Перечень репозиториев пользователя</string>
     <string name="users_title_text">Список пользователей\nс Github.com:</string>
-
-    <!-- Ошибки -->
-    <string name="error_get_list_users">Ошибка при получении списка пользователей: </string>
-    <string name="error_not_user_name">Ошибка: Нет запрошенного пользователя в списке</string>
     <string name="repo_title_tools_text">Информация о репозитории пользователя</string>
     <string name="repo_id_tools_text">ID репозитория:</string>
     <string name="repo_name_text">Имя репозитория</string>
     <string name="repo_owner_id_text">ID владельца репозитория:</string>
     <string name="forks_number_tools_text">Количество форков</string>
+    <string name="forks_fragment_repo_title_information_text">Информация о репозитории пользователя</string>
+    <string name="forks_fragment_id_text">ID:</string>
+    <string name="forks_fragment_name_repo_text">Название:</string>
+    <string name="forks_fragment_id_owner_text">ID владельца:</string>
+    <string name="forks_fragment_forks_number_text">Количество форков:</string>
+    <string name="repos_fragment_forks_title_text">Список репозиториев\nпользователя</string>
+    <string name="get_permission_write_read_text">Разрешение на запись и считывание данных получено</string>
+    <string name="not_get_permission_write_read_text">Разрешение на запись и считывание данных отсутствует</string>
+
+    <!-- Ошибки -->
+    <string name="error_get_list_users">Ошибка при получении списка пользователей: </string>
+    <string name="error_not_user_name">Ошибка: Нет запрошенного пользователя в списке</string>
+    <string name="error_not_users_List">Ошибка, список пользователей получить не удалось</string>
+    <string name="error_not_repos_List">Ошибка, список репозиториев получить не удалось</string>
 </resources>

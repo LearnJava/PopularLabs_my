@@ -1,20 +1,30 @@
 package ru.konstantin.popularlabs_my
 
 import android.app.Application
-import com.github.terrakok.cicerone.Cicerone
-import com.github.terrakok.cicerone.Router
+import ru.konstantin.popularlabs_my.di.components.*
+import ru.konstantin.popularlabs_my.di.modules.AppModule
+import ru.konstantin.popularlabs_my.di.scope.containers.ForksScopeContainer
+import ru.konstantin.popularlabs_my.di.scope.containers.ReposScopeContainer
+import ru.konstantin.popularlabs_my.di.scope.containers.UsersScopeContainer
 
-class App: Application() {
-
-    private val cicerone: Cicerone<Router> by lazy {
-        Cicerone.create()
+class App : Application(), UsersScopeContainer, ReposScopeContainer, ForksScopeContainer {
+    /** Исходные данные */ //region
+    // appComponent
+    val appComponent: AppComponent by lazy {
+        DaggerAppComponent.builder()
+            .appModule(AppModule(this))
+            .build()
     }
 
-    val navigationHolder
-        get() = cicerone.getNavigatorHolder()
+    // usersSubcomponent
+    var usersSubcomponent: GithubUsersSubcomponent? = null
 
-    val router
-        get() = cicerone.router
+    // reposSubcomponent
+    var reposSubcomponent: GithubReposSubcomponent? = null
+
+    // forksSubcomponent
+    var forksSubcomponent: GithubForksSubcomponent? = null
+    //endregion
 
     override fun onCreate() {
         super.onCreate()
@@ -26,4 +36,34 @@ class App: Application() {
         val instance
             get() = _instance!!
     }
+
+    /** Методы UsersScopeContainer */ //region
+    override fun initGithubUsersSubcomponent() = appComponent.usersSubcomponent().also {
+        usersSubcomponent = it
+    }
+
+    override fun destroyGithubUsersSubcomponent() {
+        usersSubcomponent = null
+    }
+    //endregion
+
+    /** Методы ReposScopeContainer */ //region
+    override fun initGithubReposSubcomponent() = appComponent.reposSubcomponent().also {
+        reposSubcomponent = it
+    }
+
+    override fun destroyGithubReposSubcomponent() {
+        reposSubcomponent = null
+    }
+    //endregion
+
+    /** Методы ForksScopeContainer */ //region
+    override fun initForksSubcomponent() = appComponent.forksSubcomponent().also {
+        forksSubcomponent = it
+    }
+
+    override fun destroyForksSubcomponent() {
+        forksSubcomponent = null
+    }
+    //endregion
 }
