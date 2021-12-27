@@ -7,11 +7,11 @@ import ru.konstantin.popularlabs_my.model.GithubRepoModel
 import ru.konstantin.popularlabs_my.model.GithubUserModel
 import ru.konstantin.popularlabs_my.remote.connectivity.NetworkStatus
 
-class GithubRepoRepositoryImpl (
+class GithubRepoRepositoryImpl(
     private val networkStatus: NetworkStatus,
     private val githubRepoRetrofit: GithubRepoRetrofit,
     private val githubRepoCache: GithubRepoCache
-): GithubRepoRepository {
+) : GithubRepoRepository {
     override fun getRepos(userModel: GithubUserModel): Single<List<GithubRepoModel>> {
         return if (networkStatus.isOnline())
             githubRepoRetrofit.getRetrofitRepo(userModel)

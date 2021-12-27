@@ -13,6 +13,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import moxy.MvpPresenter
 import ru.konstantin.popularlabs_my.App
+import ru.konstantin.popularlabs_my.R
+import ru.konstantin.popularlabs_my.di.scope.containers.UsersScopeContainer
 import ru.konstantin.popularlabs_my.domain.GithubUsersRepository
 import ru.konstantin.popularlabs_my.domain.UserChooseRepository
 import ru.konstantin.popularlabs_my.model.GithubUserModel
@@ -29,11 +31,14 @@ class UsersPresenter @Inject constructor(
     private val usersRepository: GithubUsersRepository,
     private val networkStatus: NetworkStatus,
     private val appScreens: AppScreens,
-    private val userChoose: UserChooseRepository
-): MvpPresenter<UsersView>() {
+    private val userChoose: UserChooseRepository,
+    private val usersScopeContainer: UsersScopeContainer,
+    private val context: Context
+) : MvpPresenter<UsersView>() {
     /** Исходные данные */ //region
     // users
     private var users: List<GithubUserModel> = listOf()
+
     // usersListPresenter
     val usersListPresenter = UsersListPresenter(App.instance.applicationContext, networkStatus)
     //endregion
@@ -68,7 +73,7 @@ class UsersPresenter @Inject constructor(
                     viewState.updateList(users)
                     viewState.hideLoading()
                 }, { e ->
-                    Log.e("mylogs", "Ошибка при получении пользователей", e)
+                    Log.e("mylogs", "${context.getString(R.string.error_not_users_List)}", e)
                     viewState.hideLoading()
                 }
             )
@@ -79,15 +84,19 @@ class UsersPresenter @Inject constructor(
         return true
     }
 
+    /** Уничтожение GithubUsersSubcomponent при уничтожении данного презентера */
+    override fun onDestroy() {
+        usersScopeContainer.destroyGithubUsersSubcomponent()
+        super.onDestroy()
+    }
+
     class UsersListPresenter @Inject constructor(
-        context: Context,
-        networkStatus: NetworkStatus
-): IListPresenter<UserItemView> {
+        private val context: Context,
+        private val networkStatus: NetworkStatus
+    ) : IListPresenter<UserItemView> {
 
         var users: MutableList<GithubUserModel> = mutableListOf<GithubUserModel>()
         private var file: File = File("")
-        private val networkStatus: NetworkStatus = networkStatus
-        private val context: Context = context
 
         override var itemClickListener: (UserItemView) -> Unit = {}
 
@@ -100,7 +109,8 @@ class UsersPresenter @Inject constructor(
             if (networkStatus.isOnline()) {
                 view.setAvatar(user.avatarUrl)
                 file = File(
-                    "${context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                    "${
+                        context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
                     }/CacheAvatars/${user.login}"
                 )
 

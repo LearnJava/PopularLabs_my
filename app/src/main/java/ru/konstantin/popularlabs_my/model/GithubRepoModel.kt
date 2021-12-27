@@ -14,10 +14,10 @@ data class GithubRepoModel(
     val owner: GithubRepoOwner,
     @Expose
     val forksCount: Int
-): Parcelable
+) : Parcelable
 
 @Parcelize
 data class GithubRepoOwner(
     @Expose
     val id: String
-): Parcelable
+) : Parcelable

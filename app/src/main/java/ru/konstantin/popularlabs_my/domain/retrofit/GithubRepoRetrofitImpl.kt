@@ -7,19 +7,18 @@ import ru.konstantin.popularlabs_my.model.GithubRepoModel
 import ru.konstantin.popularlabs_my.model.GithubUserModel
 import ru.konstantin.popularlabs_my.remote.RetrofitService
 
-class GithubRepoRetrofitImpl (
+class GithubRepoRetrofitImpl(
     private val retrofitService: RetrofitService,
     private val db: AppDatabase
-): GithubRepoRetrofit {
+) : GithubRepoRetrofit {
     override fun getRetrofitRepo(userModel: GithubUserModel): Single<List<GithubRepoModel>> {
-        return retrofitService.getRepos(userModel.reposUrl).flatMap { repos ->
-            Single.fromCallable {
+        return retrofitService.getRepos(userModel.reposUrl)
+            .flatMap { repos ->
                 val dbRepos = repos.map {
                     RoomGithubRepo(it.id, it.name, it.owner.id, it.forksCount)
                 }
                 db.repositoryDao.insert(dbRepos)
-                repos
+                    .toSingle { repos }
             }
-        }
     }
 }

@@ -12,13 +12,15 @@ import ru.konstantin.popularlabs_my.R
 import ru.konstantin.popularlabs_my.ui.base.BackButtonListener
 import javax.inject.Inject
 
-class MainActivity: MvpAppCompatActivity(R.layout.activity_main), MainView {
+class MainActivity : MvpAppCompatActivity(R.layout.activity_main), MainView {
     /** Задание переменных */ //region
     // navigatorHolder
     @Inject
     lateinit var navigatorHolder: NavigatorHolder
+
     // navigator
     private val navigator = AppNavigator(this@MainActivity, R.id.container)
+
     // moxyPresenter
     private val presenter by moxyPresenter {
         App.instance.appComponent.mainPresenter()

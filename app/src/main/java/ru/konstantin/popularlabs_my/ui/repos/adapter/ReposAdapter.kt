@@ -10,7 +10,7 @@ import ru.konstantin.popularlabs_my.model.GithubRepoModel
 
 class ReposAdapter(
     private val itemClickListener: (GithubRepoModel) -> Unit,
-): ListAdapter<GithubRepoModel, ReposAdapter.RepoViewHolder>(GithubRepoItemCallback) {
+) : ListAdapter<GithubRepoModel, ReposAdapter.RepoViewHolder>(GithubRepoItemCallback) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RepoViewHolder {
         return RepoViewHolder(

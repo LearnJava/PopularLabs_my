@@ -4,12 +4,13 @@ import ru.konstantin.popularlabs_my.model.GithubRepoModel
 import ru.konstantin.popularlabs_my.model.GithubRepoOwner
 import ru.konstantin.popularlabs_my.model.GithubUserModel
 
-class UserChooseRepositoryImpl: UserChooseRepository {
+class UserChooseRepositoryImpl : UserChooseRepository {
     /** Исходные данные */ //region
     // githubUserModel
     private var githubUserModel: GithubUserModel =
         GithubUserModel("", "", "", "")
     private var users: List<GithubUserModel> = listOf()
+
     // githubRepoModel
     private var githubRepoModel: GithubRepoModel =
         GithubRepoModel("", "", GithubRepoOwner(""), 0)

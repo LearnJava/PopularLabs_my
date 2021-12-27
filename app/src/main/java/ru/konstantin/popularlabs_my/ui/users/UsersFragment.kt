@@ -15,19 +15,23 @@ import ru.konstantin.popularlabs_my.ui.base.BackButtonListener
 import ru.konstantin.popularlabs_my.ui.users.adapter.UsersAdapter
 import ru.konstantin.popularlabs_my.ui.utils.GlideImageLoader
 
-class UsersFragment: MvpAppCompatFragment(), UsersView, BackButtonListener {
+class UsersFragment : MvpAppCompatFragment(), UsersView, BackButtonListener {
 
     /** Задание переменных */ //region
     // userChoose
     private val userChoose: UserChooseRepository = App.instance.appComponent.userChoose()
+
     // presenter
     private val presenter by moxyPresenter {
-        App.instance.appComponent.usersPresenter()
+        App.instance.initGithubUsersSubcomponent()
+        App.instance.usersSubcomponent?.provideUsersPresenter()!!
     }
+
     // binding
     private var _binding: FragmentUsersBinding? = null
     private val binding
         get() = _binding!!
+
     // adapter
     private val adapter by lazy {
         UsersAdapter(

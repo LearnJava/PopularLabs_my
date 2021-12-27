@@ -6,11 +6,11 @@ import ru.konstantin.popularlabs_my.domain.retrofit.GithubUsersRetrofit
 import ru.konstantin.popularlabs_my.model.GithubUserModel
 import ru.konstantin.popularlabs_my.remote.connectivity.NetworkStatus
 
-class GithubUsersRepositoryImpl (
+class GithubUsersRepositoryImpl(
     private val networkStatus: NetworkStatus,
     private val githubUsersRetrofit: GithubUsersRetrofit,
     private val githubUsersCache: GithubUsersCache
-): GithubUsersRepository {
+) : GithubUsersRepository {
     override fun getUsers(): Single<List<GithubUserModel>> {
         return if (networkStatus.isOnline())
             githubUsersRetrofit.getRetrofitUsers()

@@ -9,23 +9,28 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 import ru.konstantin.popularlabs_my.App
+import ru.konstantin.popularlabs_my.R
 import ru.konstantin.popularlabs_my.databinding.FragmentReposBinding
 import ru.konstantin.popularlabs_my.domain.UserChooseRepository
 import ru.konstantin.popularlabs_my.model.GithubRepoModel
 import ru.konstantin.popularlabs_my.ui.base.BackButtonListener
 
-class ReposFragment: MvpAppCompatFragment(), ReposView, BackButtonListener {
+class ReposFragment : MvpAppCompatFragment(), ReposView, BackButtonListener {
     /** ЗАДАНИЕ ПЕРЕМЕННЫХ */ //region
     // userChoose
     private val userChoose: UserChooseRepository = App.instance.appComponent.userChoose()
+
     // presenter
     private val presenter by moxyPresenter {
-        App.instance.appComponent.reposPresenter()
+        App.instance.initGithubReposSubcomponent()
+        App.instance.reposSubcomponent?.provideReposPresenter()!!
     }
+
     // binding
     private var _binding: FragmentReposBinding? = null
     private val binding
         get() = _binding!!
+
     // adapter
     private val adapter by lazy {
         ReposAdapter { presenter.onRepoClicked(it) }
@@ -46,8 +51,11 @@ class ReposFragment: MvpAppCompatFragment(), ReposView, BackButtonListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         /** Установка заголовка окна */
-        binding.reposTitle.text =
-            "Список репозиториев\nпользователя \"${userChoose.getGithubUserModel().login}\":"
+        binding.reposTitle.text = "${
+            requireActivity().getString(R.string.repos_fragment_forks_title_text)
+        } \"${
+            userChoose.getGithubUserModel().login
+        }\":"
         /** Установка списка репозиториев пользователя */
         binding.reposRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.reposRecycler.adapter = adapter
@@ -74,11 +82,14 @@ class ReposFragment: MvpAppCompatFragment(), ReposView, BackButtonListener {
         fun newInstance() = ReposFragment()
     }
 
+    @SuppressLint("SetTextI18n")
     override fun onResume() {
         super.onResume()
 
         binding.reposTitle.text =
-            "Список репозиториев\nпользователя \"${userChoose.getGithubUserModel().login}\":"
+            "${requireActivity().getString(R.string.repos_fragment_forks_title_text)} \"${
+                userChoose.getGithubUserModel().login
+            }\":"
         binding.reposRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.reposRecycler.adapter = adapter
     }

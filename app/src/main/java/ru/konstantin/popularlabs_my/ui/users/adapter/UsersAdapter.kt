@@ -14,7 +14,7 @@ import ru.konstantin.popularlabs_my.ui.utils.ImageLoader
 class UsersAdapter(
     private val presenter: UsersPresenter.UsersListPresenter,
     private val imageLoader: ImageLoader<ImageView>
-): RecyclerView.Adapter<UsersAdapter.UserViewHolder>() {
+) : RecyclerView.Adapter<UsersAdapter.UserViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UserViewHolder {
         return UserViewHolder(
@@ -61,7 +61,7 @@ class UsersAdapter(
     class DiffCallback(
         var oldList: List<GithubUserModel>,
         var newList: List<GithubUserModel>
-    ): DiffUtil.Callback() {
+    ) : DiffUtil.Callback() {
         override fun getOldListSize(): Int {
             return oldList.size
         }
