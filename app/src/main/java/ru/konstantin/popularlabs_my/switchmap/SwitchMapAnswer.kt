@@ -24,9 +24,9 @@ class Producer {
                 )
             }
             .subscribe({ s ->
-                Log.d("mylogs", "onNext: $s")
+                Log.d("logsToMe", "onNext: $s")
             }, {
-                Log.d("mylogs","onError: ${it.message}")
+                Log.d("logsToMe","onError: ${it.message}")
             })
     }
 }

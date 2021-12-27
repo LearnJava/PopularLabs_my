@@ -12,9 +12,9 @@ import moxy.ktx.moxyPresenter
 import ru.konstantin.popularlabs_my.App
 import ru.konstantin.popularlabs_my.databinding.FragmentReposBinding
 import ru.konstantin.popularlabs_my.domain.GithubRepoRepositoryImpl
+import ru.konstantin.popularlabs_my.domain.cache.RoomGithubRepositoriesCache
 import ru.konstantin.popularlabs_my.model.GithubRepoModel
-import ru.konstantin.popularlabs_my.model.GithubUserModel
-import ru.konstantin.popularlabs_my.remote.ApiHolder
+import ru.konstantin.popularlabs_my.remote.connectivity.NetworkStatus
 import ru.konstantin.popularlabs_my.ui.base.BackButtonListener
 import ru.konstantin.popularlabs_my.ui.main.MainActivity
 
@@ -24,7 +24,9 @@ class ReposFragment: MvpAppCompatFragment(), ReposView, BackButtonListener {
     private val presenter by moxyPresenter {
         ReposPresenter(
             router = App.instance.router,
-            repo = GithubRepoRepositoryImpl(retrofitService = ApiHolder.retrofitService),
+            repo = GithubRepoRepositoryImpl(
+                RoomGithubRepositoriesCache(NetworkStatus(requireContext()))
+            ),
             this@ReposFragment
         )
     }

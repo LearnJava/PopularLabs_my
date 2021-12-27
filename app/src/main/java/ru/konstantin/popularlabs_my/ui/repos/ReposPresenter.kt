@@ -15,10 +15,6 @@ class ReposPresenter(
     private val repo: GithubRepoRepository,
     private val reposFragment: ReposFragment
 ): MvpPresenter<ReposView>() {
-    /** ИСХОДНЫЕ ДАННЫЕ */ //region
-    // userModel
-    private var userModel: GithubUserModel? = null
-    //endregion
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
@@ -40,7 +36,7 @@ class ReposPresenter(
                             viewState.hideLoading()
                             mainActivity.setReposModel(repos)
                         }, {
-                            Log.e("mylogs",
+                            Log.e("logsToMe",
                                 "Ошибка при получении репозиториев",
                                 it
                             )
