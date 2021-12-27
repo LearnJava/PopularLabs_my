@@ -8,7 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 import ru.konstantin.popularlabs_my.databinding.ItemRepoBinding
 import ru.konstantin.popularlabs_my.model.GithubRepoModel
 
-class ReposAdapter (
+class ReposAdapter(
     private val itemClickListener: (GithubRepoModel) -> Unit,
 ): ListAdapter<GithubRepoModel, ReposAdapter.RepoViewHolder>(GithubRepoItemCallback) {
 
@@ -22,7 +22,7 @@ class ReposAdapter (
         holder.showRepo(currentList[position])
     }
 
-    inner class RepoViewHolder(private val vb: ItemRepoBinding): RecyclerView.ViewHolder(vb.root) {
+    inner class RepoViewHolder(private val vb: ItemRepoBinding) : RecyclerView.ViewHolder(vb.root) {
 
         fun showRepo(repo: GithubRepoModel) {
             vb.root.setOnClickListener { itemClickListener(repo) }
@@ -31,7 +31,7 @@ class ReposAdapter (
     }
 }
 
-object GithubRepoItemCallback: DiffUtil.ItemCallback<GithubRepoModel>() {
+object GithubRepoItemCallback : DiffUtil.ItemCallback<GithubRepoModel>() {
 
     override fun areItemsTheSame(oldItem: GithubRepoModel, newItem: GithubRepoModel): Boolean {
         return oldItem == newItem

@@ -32,7 +32,7 @@ class UsersAdapter(
         return presenter.getCount()
     }
 
-    inner class UserViewHolder(private val vb: ItemUserBinding): RecyclerView.ViewHolder(vb.root),
+    inner class UserViewHolder(private val vb: ItemUserBinding) : RecyclerView.ViewHolder(vb.root),
         UserItemView {
 
         override var pos: Int = -1
@@ -57,6 +57,7 @@ class UsersAdapter(
         }
         diffResult.dispatchUpdatesTo(this)
     }
+
     class DiffCallback(
         var oldList: List<GithubUserModel>,
         var newList: List<GithubUserModel>

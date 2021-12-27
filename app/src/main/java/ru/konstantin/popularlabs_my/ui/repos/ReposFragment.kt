@@ -1,7 +1,6 @@
 package ru.konstantin.popularlabs_my.ui.repos
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -11,24 +10,17 @@ import moxy.MvpAppCompatFragment
 import moxy.ktx.moxyPresenter
 import ru.konstantin.popularlabs_my.App
 import ru.konstantin.popularlabs_my.databinding.FragmentReposBinding
-import ru.konstantin.popularlabs_my.domain.GithubRepoRepositoryImpl
-import ru.konstantin.popularlabs_my.domain.cache.RoomGithubRepositoriesCache
+import ru.konstantin.popularlabs_my.domain.UserChooseRepository
 import ru.konstantin.popularlabs_my.model.GithubRepoModel
-import ru.konstantin.popularlabs_my.remote.connectivity.NetworkStatus
 import ru.konstantin.popularlabs_my.ui.base.BackButtonListener
-import ru.konstantin.popularlabs_my.ui.main.MainActivity
 
 class ReposFragment: MvpAppCompatFragment(), ReposView, BackButtonListener {
     /** ЗАДАНИЕ ПЕРЕМЕННЫХ */ //region
+    // userChoose
+    private val userChoose: UserChooseRepository = App.instance.appComponent.userChoose()
     // presenter
     private val presenter by moxyPresenter {
-        ReposPresenter(
-            router = App.instance.router,
-            repo = GithubRepoRepositoryImpl(
-                RoomGithubRepositoriesCache(NetworkStatus(requireContext()))
-            ),
-            this@ReposFragment
-        )
+        App.instance.appComponent.reposPresenter()
     }
     // binding
     private var _binding: FragmentReposBinding? = null
@@ -38,16 +30,13 @@ class ReposFragment: MvpAppCompatFragment(), ReposView, BackButtonListener {
     private val adapter by lazy {
         ReposAdapter { presenter.onRepoClicked(it) }
     }
-    // mainActivity
-    private var mainActivity: MainActivity? = null
     //endregion
 
-    override fun onAttach(context: Context) {
-        super.onAttach(context)
-        mainActivity = (context as MainActivity)
-    }
-
-    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View {
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
         _binding = FragmentReposBinding.inflate(inflater, container, false)
         return binding.root
 
@@ -56,12 +45,10 @@ class ReposFragment: MvpAppCompatFragment(), ReposView, BackButtonListener {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        mainActivity?.let { mainActivity ->
-            mainActivity.getGithubUserModel()?.let { userModel ->
-                binding.reposTitle.text = "Список репозиториев\nпользователя \"${userModel.login}\":"
-            }
-        }
+        /** Установка заголовка окна */
+        binding.reposTitle.text =
+            "Список репозиториев\nпользователя \"${userChoose.getGithubUserModel().login}\":"
+        /** Установка списка репозиториев пользователя */
         binding.reposRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.reposRecycler.adapter = adapter
     }
@@ -87,18 +74,11 @@ class ReposFragment: MvpAppCompatFragment(), ReposView, BackButtonListener {
         fun newInstance() = ReposFragment()
     }
 
-    fun getMainActivity(): MainActivity? {
-        return mainActivity
-    }
-
     override fun onResume() {
         super.onResume()
 
-        mainActivity?.let { mainActivity ->
-            mainActivity.getGithubUserModel()?.let { userModel ->
-                binding.reposTitle.text = "Список репозиториев\nпользователя \"${userModel.login}\":"
-            }
-        }
+        binding.reposTitle.text =
+            "Список репозиториев\nпользователя \"${userChoose.getGithubUserModel().login}\":"
         binding.reposRecycler.layoutManager = LinearLayoutManager(requireContext())
         binding.reposRecycler.adapter = adapter
     }
