@@ -1,20 +1,17 @@
 package ru.konstantin.popularlabs_my
 
 import android.app.Application
-import com.github.terrakok.cicerone.Cicerone
-import com.github.terrakok.cicerone.Router
+import ru.konstantin.popularlabs_my.di.components.AppComponent
+import ru.konstantin.popularlabs_my.di.components.DaggerAppComponent
+import ru.konstantin.popularlabs_my.di.modules.ContextModule
 
 class App: Application() {
 
-    private val cicerone: Cicerone<Router> by lazy {
-        Cicerone.create()
+    val appComponent: AppComponent by lazy {
+        DaggerAppComponent.builder()
+            .contextModule(ContextModule(this))
+            .build()
     }
-
-    val navigationHolder
-        get() = cicerone.getNavigatorHolder()
-
-    val router
-        get() = cicerone.router
 
     override fun onCreate() {
         super.onCreate()

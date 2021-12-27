@@ -6,7 +6,6 @@ import kotlinx.android.parcel.Parcelize
 
 @Parcelize
 data class GithubUserModel(
-
     @Expose
     val id: String,
     @Expose

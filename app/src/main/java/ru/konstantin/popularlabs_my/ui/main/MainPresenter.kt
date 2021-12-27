@@ -7,15 +7,17 @@ import androidx.core.app.ActivityCompat
 import com.github.terrakok.cicerone.Router
 import moxy.MvpPresenter
 import ru.konstantin.popularlabs_my.screens.AppScreens
+import javax.inject.Inject
 
-class MainPresenter(
-    private val router: Router
+class MainPresenter @Inject constructor(
+    private val router: Router,
+    private val appScreens: AppScreens
 ): MvpPresenter<MainView>() {
 
     override fun onFirstViewAttach() {
         super.onFirstViewAttach()
 
-        router.replaceScreen(AppScreens.usersScreen())
+        router.replaceScreen(appScreens.usersScreen())
     }
 
     fun backPressed() {
@@ -26,7 +28,8 @@ class MainPresenter(
     fun isStoragePermissionGranted(mainActivity: MainActivity): Boolean {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (mainActivity.checkSelfPermission(
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                )
                 == PackageManager.PERMISSION_GRANTED
             ) {
                 mainActivity.showMessage("Разрешение на запись и считывание данных получено")
@@ -36,7 +39,8 @@ class MainPresenter(
                 ActivityCompat.requestPermissions(
                     mainActivity,
                     arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
-                    1)
+                    1
+                )
                 false
             }
         } else {

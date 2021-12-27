@@ -5,15 +5,19 @@ import com.github.terrakok.cicerone.Router
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers
 import io.reactivex.rxjava3.schedulers.Schedulers
 import moxy.MvpPresenter
+import ru.konstantin.popularlabs_my.App
 import ru.konstantin.popularlabs_my.domain.GithubRepoRepository
+import ru.konstantin.popularlabs_my.domain.UserChooseRepository
 import ru.konstantin.popularlabs_my.model.GithubRepoModel
 import ru.konstantin.popularlabs_my.model.GithubUserModel
 import ru.konstantin.popularlabs_my.screens.AppScreens
+import javax.inject.Inject
 
-class ReposPresenter(
+class ReposPresenter @Inject constructor(
     private val router: Router,
     private val repo: GithubRepoRepository,
-    private val reposFragment: ReposFragment
+    private val appScreens: AppScreens,
+    private val userChoose: UserChooseRepository
 ): MvpPresenter<ReposView>() {
 
     override fun onFirstViewAttach() {
@@ -23,40 +27,36 @@ class ReposPresenter(
     }
 
     private fun loadData() {
-        reposFragment.getMainActivity()?.let { mainActivity ->
-            val userModel: GithubUserModel = mainActivity.getGithubUserModel()
-            userModel?.let { userModel ->
-                repo.getRepos(userModel)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .doOnSubscribe { viewState.showLoading() }
-                    .subscribe(
-                        { repos ->
-                            viewState.showRepos(repos)
-                            viewState.hideLoading()
-                            mainActivity.setReposModel(repos)
-                        }, {
-                            Log.e("logsToMe",
-                                "Ошибка при получении репозиториев",
-                                it
-                            )
-                            viewState.hideLoading()
-                        }
-                    )
-            }
+        val userModel: GithubUserModel = userChoose.getGithubUserModel()
+        userModel?.let { userModel ->
+            repo.getRepos(userModel)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnSubscribe { viewState.showLoading() }
+                .subscribe(
+                    { repos ->
+                        viewState.showRepos(repos)
+                        viewState.hideLoading()
+                        userChoose.setReposModel(repos)
+                    }, {
+                        Log.e(
+                            "mylogs",
+                            "Ошибка при получении репозиториев",
+                            it
+                        )
+                        viewState.hideLoading()
+                    }
+                )
         }
     }
 
     fun onRepoClicked(repo: GithubRepoModel) {
-        reposFragment.getMainActivity()?.let { mainActivity ->
-            mainActivity.setGithubRepoModel(repo)
-        }
-        router.navigateTo(AppScreens.forksScreen())
+        userChoose.setGithubRepoModel(repo)
+        router.navigateTo(appScreens.forksScreen())
     }
 
     fun backPressed(): Boolean {
         router.exit()
         return true
     }
-
 }

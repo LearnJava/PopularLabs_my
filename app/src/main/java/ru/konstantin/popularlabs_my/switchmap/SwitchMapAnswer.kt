@@ -19,14 +19,15 @@ class Producer {
         createJust()
             .switchMap {
                 val delay = Random.nextInt(1000).toLong()
-                return@switchMap Observable.just(it + "x").delay(delay,
+                return@switchMap Observable.just(it + "x").delay(
+                    delay,
                     java.util.concurrent.TimeUnit.MILLISECONDS
                 )
             }
             .subscribe({ s ->
-                Log.d("logsToMe", "onNext: $s")
+                Log.d("mylogs", "onNext: $s")
             }, {
-                Log.d("logsToMe","onError: ${it.message}")
+                Log.d("mylogs", "onError: ${it.message}")
             })
     }
 }

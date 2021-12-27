@@ -23,21 +23,23 @@ class NetworkStatus(context: Context) {
     init {
         val request = NetworkRequest.Builder().build()
 
-        connectivityManager?.registerNetworkCallback(request, object : ConnectivityManager.NetworkCallback() {
-            /** Сеть есть уже сейчас */
-            override fun onAvailable(network: Network) {
-                networkSubject.onNext(true)
-            }
+        connectivityManager?.registerNetworkCallback(
+            request,
+            object : ConnectivityManager.NetworkCallback() {
+                /** Сеть есть уже сейчас */
+                override fun onAvailable(network: Network) {
+                    networkSubject.onNext(true)
+                }
 
-            /** Сеть потеряна */
-            override fun onLost(network: Network) {
-                networkSubject.onNext(false)
-            }
+                /** Сеть потеряна */
+                override fun onLost(network: Network) {
+                    networkSubject.onNext(false)
+                }
 
-            /** Сеть не обнаружена после запроса */
-            override fun onUnavailable() {
-                networkSubject.onNext(false)
-            }
-        })
+                /** Сеть не обнаружена после запроса */
+                override fun onUnavailable() {
+                    networkSubject.onNext(false)
+                }
+            })
     }
 }

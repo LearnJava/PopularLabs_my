@@ -1,5 +1,6 @@
 package ru.konstantin.popularlabs_my.ui.users
 
+import android.content.Context
 import android.graphics.Bitmap
 import android.os.Environment
 import android.util.Log
@@ -11,7 +12,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import moxy.MvpPresenter
+import ru.konstantin.popularlabs_my.App
 import ru.konstantin.popularlabs_my.domain.GithubUsersRepository
+import ru.konstantin.popularlabs_my.domain.UserChooseRepository
 import ru.konstantin.popularlabs_my.model.GithubUserModel
 import ru.konstantin.popularlabs_my.remote.connectivity.NetworkStatus
 import ru.konstantin.popularlabs_my.screens.AppScreens
@@ -19,18 +22,20 @@ import ru.konstantin.popularlabs_my.ui.base.IListPresenter
 import java.io.File
 import java.io.FileOutputStream
 import java.io.OutputStream
+import javax.inject.Inject
 
-class UsersPresenter(
+class UsersPresenter @Inject constructor(
     private val router: Router,
     private val usersRepository: GithubUsersRepository,
-    private val usersFragment: UsersFragment?,
-    private val networkStatus: NetworkStatus
+    private val networkStatus: NetworkStatus,
+    private val appScreens: AppScreens,
+    private val userChoose: UserChooseRepository
 ): MvpPresenter<UsersView>() {
-    /** ИСХОДНЫЕ ДАННЫЕ */ //region
+    /** Исходные данные */ //region
     // users
     private var users: List<GithubUserModel> = listOf()
     // usersListPresenter
-    val usersListPresenter = UsersListPresenter(usersFragment, networkStatus)
+    val usersListPresenter = UsersListPresenter(App.instance.applicationContext, networkStatus)
     //endregion
 
     override fun onFirstViewAttach() {
@@ -38,39 +43,32 @@ class UsersPresenter(
 
         loadData()
 
-        usersFragment?.let { usersFragment ->
-            usersListPresenter.itemClickListener = { userItemView ->
-                val userModel: GithubUserModel = GithubUserModel(
-                    users[userItemView.pos].id,
-                    users[userItemView.pos].login,
-                    users[userItemView.pos].avatarUrl,
-                    users[userItemView.pos].reposUrl)
-                usersFragment.getMainActivity()?.let { mainActivity ->
-                    mainActivity.setGithubUserModel(userModel)
-                    mainActivity.setUsersModel(users)
-                }
-                router.navigateTo(AppScreens.repoScreen())
-            }
+        usersListPresenter.itemClickListener = { userItemView ->
+            val userModel: GithubUserModel = GithubUserModel(
+                users[userItemView.pos].id,
+                users[userItemView.pos].login,
+                users[userItemView.pos].avatarUrl,
+                users[userItemView.pos].reposUrl
+            )
+            userChoose.setGithubUserModel(userModel)
+            userChoose.setUsersModel(users)
+            router.navigateTo(appScreens.repoScreen())
         }
     }
 
     fun loadData() {
-        usersRepository.getCachedUsers()
+        usersRepository.getUsers()
             .subscribeOn(Schedulers.io())
             .observeOn(AndroidSchedulers.mainThread())
             .doOnSubscribe { viewState.showLoading() }
             .subscribe(
                 { users ->
                     this.users = users
-                    usersFragment?.let { usersFragment ->
-                        usersFragment.getMainActivity()?.let { mainActivity ->
-                            mainActivity.setUsersModel(users)
-                        }
-                    }
+                    userChoose.setUsersModel(users)
                     viewState.updateList(users)
                     viewState.hideLoading()
                 }, { e ->
-                    Log.e("logsToMe", "Ошибка при получении пользователей", e)
+                    Log.e("mylogs", "Ошибка при получении пользователей", e)
                     viewState.hideLoading()
                 }
             )
@@ -81,13 +79,15 @@ class UsersPresenter(
         return true
     }
 
-    class UsersListPresenter(usersFragment: UsersFragment?, networkStatus: NetworkStatus):
-        IListPresenter<UserItemView> {
+    class UsersListPresenter @Inject constructor(
+        context: Context,
+        networkStatus: NetworkStatus
+): IListPresenter<UserItemView> {
 
         var users: MutableList<GithubUserModel> = mutableListOf<GithubUserModel>()
-        private val usersFragment: UsersFragment? = usersFragment
         private var file: File = File("")
         private val networkStatus: NetworkStatus = networkStatus
+        private val context: Context = context
 
         override var itemClickListener: (UserItemView) -> Unit = {}
 
@@ -97,47 +97,46 @@ class UsersPresenter(
             val user = users[view.pos]
             view.setLogin(user.login)
 
-            usersFragment?.let { usersFragment ->
-                if (networkStatus.isOnline()) {
-                    view.setAvatar(user.avatarUrl)
-                    usersFragment.getMainActivity()?.let { mainActivity ->
-                        file = File("${mainActivity.getExternalFilesDir(
-                                    Environment.DIRECTORY_PICTURES)}/CacheAvatars/${user.login}")
+            if (networkStatus.isOnline()) {
+                view.setAvatar(user.avatarUrl)
+                file = File(
+                    "${context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                    }/CacheAvatars/${user.login}"
+                )
 
-                        /** Сохранение картинки в локальную папку с данным приложением */
-                        /** Создание директории, если она ещё не создана */
-                        if (!file.exists()) {
-                            file.mkdirs()
-                        }
-                        file = File(file, "${user.login}.jpg")
-                        /** Создание файла */
-                        file.createNewFile()
+                /** Сохранение картинки в локальную папку с данным приложением */
+                /** Создание директории, если она ещё не создана */
+                if (!file.exists()) {
+                    file.mkdirs()
+                }
+                file = File(file, "${user.login}.jpg")
+                /** Создание файла */
+                file.createNewFile()
 
-                        CoroutineScope(Dispatchers.IO).launch {
-                            saveImage(
-                                Glide.with(mainActivity)
-                                    .asBitmap()
-                                    .load(user.avatarUrl)
-                                    .placeholder(android.R.drawable.progress_indeterminate_horizontal)
-                                    .error(android.R.drawable.stat_notify_error)
-                                    .submit()
-                                    .get(), file
-                            )
-                        }
-                    }
-                } else {
-                    usersFragment.getMainActivity()?.let { mainActivity ->
-                        file = File("${mainActivity.getExternalFilesDir(
-                                    Environment.DIRECTORY_PICTURES)
-                            }/CacheAvatars/${user.login}")
-                        file = File(file, "${user.login}.jpg")
-                        if ((file.exists()) && (file.length() > 0)) {
-                            view.setAvatar(file.toString())
-                        }
-                    }
+                CoroutineScope(Dispatchers.IO).launch {
+                    saveImage(
+                        Glide.with(context)
+                            .asBitmap()
+                            .load(user.avatarUrl)
+                            .placeholder(android.R.drawable.progress_indeterminate_horizontal)
+                            .error(android.R.drawable.stat_notify_error)
+                            .submit()
+                            .get(), file
+                    )
+                }
+            } else {
+                file = File(
+                    "${
+                        context.getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+                    }/CacheAvatars/${user.login}"
+                )
+                file = File(file, "${user.login}.jpg")
+                if ((file.exists()) && (file.length() > 0)) {
+                    view.setAvatar(file.toString())
                 }
             }
         }
+
         /** Сохранение картинки */
         private fun saveImage(image: Bitmap, outPutFile: File) {
             try {
