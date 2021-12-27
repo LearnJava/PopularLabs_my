@@ -4,4 +4,25 @@
     <dimen name="item_layout_height">50dp</dimen>
     <dimen name="user_login_text_size">20sp</dimen>
     <dimen name="tv_login_text_size">20sp</dimen>
+    <dimen name="user_image_width">64dp</dimen>
+    <dimen name="user_image_height">64dp</dimen>
+    <dimen name="item_user_padding">8dp</dimen>
+    <dimen name="loading_view_width">100dp</dimen>
+    <dimen name="loading_view_height">100dp</dimen>
+    <dimen name="tv_repo_name_margin_start">8dp</dimen>
+    <dimen name="item_repo_padding">8dp</dimen>
+    <dimen name="repos_recycler_margin_top">50dp</dimen>
+    <dimen name="repos_title_text_size">20sp</dimen>
+    <dimen name="tv_repo_name_text_size">20sp</dimen>
+    <dimen name="forks_number_margin_top">10dp</dimen>
+    <dimen name="forks_number_text_size">20sp</dimen>
+    <dimen name="users_title_margin">10dp</dimen>
+    <dimen name="users_title_text_size">20sp</dimen>
+    <dimen name="repo_title_text_size">20sp</dimen>
+    <dimen name="repo_id_margin_top">15dp</dimen>
+    <dimen name="repo_id_text_size">20sp</dimen>
+    <dimen name="repo_name_mragin_top">10dp</dimen>
+    <dimen name="repo_name_text_size">20sp</dimen>
+    <dimen name="repo_owner_id_margin_top">10dp</dimen>
+    <dimen name="repo_owner_id_text_size">20sp</dimen>
 </resources>
